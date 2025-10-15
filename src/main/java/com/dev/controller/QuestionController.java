@@ -50,11 +50,14 @@ public class QuestionController {
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return questionService.searchQuestions(query, page, size);
     }
 
     @GetMapping("/tag/{tag}")
-    public Flux<QuestionResponseDTO> getQuestionsByTag(@PathVariable String tag) {
+    public Flux<QuestionResponseDTO> getQuestionsByTag(
+        @PathVariable String tag,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "100") int size) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

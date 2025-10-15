@@ -2,9 +2,10 @@ package com.dev.services;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-
+import com.dev.adapter.QuestionAdapter;
 import com.dev.dto.QuestionRequestDTO;
 import com.dev.dto.QuestionResponseDTO;
 import com.dev.models.Question;
@@ -12,6 +13,8 @@ import com.dev.repository.QuestionRepository;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
+
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +43,12 @@ public class QuestionService implements IQuestionService {
                 .build());
         //return ans;
                 
+    }
+
+    public Flux<QuestionResponseDTO> searchQuestions(String searchTerm, int offset, int page) {
+        return questionRepository.findByTitleOrContentContainingIgnoreCase(searchTerm, PageRequest.of(offset, page))
+        .map(QuestionAdapter::toQuestionResponseDTO)
+        .doOnError(error -> System.out.println("Error searching questions: " + error))
+        .doOnComplete(() -> System.out.println("Questions searched successfully"));
     }
 }
