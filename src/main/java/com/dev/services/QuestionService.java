@@ -3,6 +3,7 @@ package com.dev.services;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.dev.adapter.QuestionAdapter;
@@ -22,9 +23,6 @@ public class QuestionService implements IQuestionService {
 
     private final QuestionRepository questionRepository;
 
-    // public QuestionService(QuestionRepository questionRepository) {
-    //     this.questionRepository = questionRepository;
-    // }
 
     @Override
     public Mono<QuestionResponseDTO> createQuestion(QuestionRequestDTO questionRequestDTO) {
@@ -50,5 +48,10 @@ public class QuestionService implements IQuestionService {
         .map(QuestionAdapter::toQuestionResponseDTO)
         .doOnError(error -> System.out.println("Error searching questions: " + error))
         .doOnComplete(() -> System.out.println("Questions searched successfully"));
+    }
+
+    public Flux<QuestionResponseDTO> getAllQuestions(String cursor,int size){
+        Pageable pageable = PageRequest.of(0,size);
+        return null;
     }
 }

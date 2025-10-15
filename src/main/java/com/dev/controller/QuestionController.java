@@ -36,7 +36,10 @@ public class QuestionController {
     }
 
     @GetMapping
-    public Flux<QuestionResponseDTO> getAllQuestions() {
+    public Flux<QuestionResponseDTO> getAllQuestions(
+        @RequestParam(required = false) String cursor,
+        @RequestParam(defaultValue = "10") int page
+    ) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
