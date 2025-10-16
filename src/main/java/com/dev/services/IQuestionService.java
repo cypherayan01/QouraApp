@@ -13,6 +13,8 @@ public interface IQuestionService {
 
     public Flux<QuestionResponseDTO> searchQuestions(String query, int offset, int page);
 
-    public Flux<QuestionResponseDTO> getAllQuestions(String cursor, int page);
+    public Flux<QuestionResponseDTO> getAllQuestions(String cursor, int size);
+
+
 
 }

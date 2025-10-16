@@ -1,5 +1,7 @@
 package com.dev.controller;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,9 +40,11 @@ public class QuestionController {
     @GetMapping
     public Flux<QuestionResponseDTO> getAllQuestions(
         @RequestParam(required = false) String cursor,
-        @RequestParam(defaultValue = "10") int page
+        @RequestParam(defaultValue = "10") int size
     ) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return questionService.getAllQuestions(cursor, size)
+                .doOnError(error -> System.out.println("Error fetching questions : "+error))
+                .doOnComplete(() -> System.out.println("All question fetched succeccfully."));
     }
 
     @DeleteMapping("/{id}")

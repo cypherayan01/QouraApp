@@ -6,11 +6,11 @@ import lombok.*;
 @Data
 @Builder
 public class QuestionResponseDTO {
-    
-    
+
+    private String id;
     private String title;
     private String content;
     private LocalDateTime createdAt;
-    private String id;
+
     
 }

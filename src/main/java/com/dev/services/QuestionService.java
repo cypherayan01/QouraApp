@@ -2,6 +2,7 @@ package com.dev.services;
 
 import java.time.LocalDateTime;
 
+import com.dev.utils.CursorUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,8 +44,8 @@ public class QuestionService implements IQuestionService {
                 
     }
 
-    public Flux<QuestionResponseDTO> searchQuestions(String searchTerm, int offset, int page) {
-        return questionRepository.findByTitleOrContentContainingIgnoreCase(searchTerm, PageRequest.of(offset, page))
+    public Flux<QuestionResponseDTO> searchQuestions(String searchTerm, int offset, int size) {
+        return questionRepository.findByTitleOrContentContainingIgnoreCase(searchTerm, PageRequest.of(offset, size))
         .map(QuestionAdapter::toQuestionResponseDTO)
         .doOnError(error -> System.out.println("Error searching questions: " + error))
         .doOnComplete(() -> System.out.println("Questions searched successfully"));
@@ -52,6 +53,18 @@ public class QuestionService implements IQuestionService {
 
     public Flux<QuestionResponseDTO> getAllQuestions(String cursor,int size){
         Pageable pageable = PageRequest.of(0,size);
-        return null;
+        if(!CursorUtils.isValidCursor(cursor)){
+            return questionRepository.findTop10ByOrderByCreatedAtAsc()
+                    .take(size)
+                    .map(QuestionAdapter::toQuestionResponseDTO)
+                    .doOnError(error -> System.out.println("Error : "+error))
+                    .doOnComplete(() -> System.out.println("Fetched successfully" + size));
+        }else{
+            LocalDateTime currentCursorTime = CursorUtils.parseCursor(cursor);
+            return questionRepository.findByCreatedAtGreaterThanOrderByCreatedAtAsc(currentCursorTime,size)
+                    .map(QuestionAdapter :: toQuestionResponseDTO)
+                    .doOnError(error -> System.out.println("Error : "+error))
+                    .doOnComplete(() -> System.out.println("Fetched successfully"));
+        }
     }
 }
