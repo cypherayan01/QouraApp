@@ -3,9 +3,8 @@ package com.dev.services;
 import com.dev.dto.QuestionRequestDTO;
 import com.dev.dto.QuestionResponseDTO;
 
-
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface IQuestionService {
 
@@ -15,6 +14,8 @@ public interface IQuestionService {
 
     public Flux<QuestionResponseDTO> getAllQuestions(String cursor, int size);
 
+    public Mono<QuestionResponseDTO> getQuestionById(String id);
 
+    
 
 }
