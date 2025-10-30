@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import com.dev.adapter.QuestionAdapter;
 import com.dev.dto.QuestionRequestDTO;
 import com.dev.dto.QuestionResponseDTO;
+import com.dev.events.ViewCountEvent;
 import com.dev.models.Question;
+import com.dev.producers.KafkaEventProducers;
 import com.dev.repository.QuestionRepository;
 import com.dev.utils.CursorUtils;
 
@@ -19,10 +21,16 @@ import reactor.core.publisher.Mono;
 
 
 @Service
-@RequiredArgsConstructor
 public class QuestionService implements IQuestionService {
 
     private final QuestionRepository questionRepository;
+
+    private final KafkaEventProducers kafkaEventProducer;
+
+    public QuestionService(QuestionRepository questionRepository,KafkaEventProducers kafkaEventProducer) {
+        this.questionRepository = questionRepository;
+        this.kafkaEventProducer = kafkaEventProducer;
+    }
 
 
     @Override
@@ -73,6 +81,10 @@ public class QuestionService implements IQuestionService {
         return questionRepository.findById(id)
                 .map(QuestionAdapter::toQuestionResponseDTO)
                 .doOnError(error -> System.out.println("Error fetching question by ID: " + error))
-                .doOnSuccess(q -> System.out.println("Question fetched successfully by ID: " + id));
+                .doOnSuccess(response ->{
+                    System.out.println("Question fetched successfully : " + response);
+                    ViewCountEvent viewCountEvent =new ViewCountEvent(id,"question",LocalDateTime.now());
+                    kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                });
     }
 }
