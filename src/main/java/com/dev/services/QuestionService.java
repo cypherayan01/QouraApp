@@ -2,7 +2,6 @@ package com.dev.services;
 
 import java.time.LocalDateTime;
 
-import com.dev.utils.CursorUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,10 +11,11 @@ import com.dev.dto.QuestionRequestDTO;
 import com.dev.dto.QuestionResponseDTO;
 import com.dev.models.Question;
 import com.dev.repository.QuestionRepository;
+import com.dev.utils.CursorUtils;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @Service
@@ -66,5 +66,13 @@ public class QuestionService implements IQuestionService {
                     .doOnError(error -> System.out.println("Error : "+error))
                     .doOnComplete(() -> System.out.println("Fetched successfully"));
         }
+    }
+
+    @Override
+    public Mono<QuestionResponseDTO> getQuestionById(String id) {
+        return questionRepository.findById(id)
+                .map(QuestionAdapter::toQuestionResponseDTO)
+                .doOnError(error -> System.out.println("Error fetching question by ID: " + error))
+                .doOnSuccess(q -> System.out.println("Question fetched successfully by ID: " + id));
     }
 }
