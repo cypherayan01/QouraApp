@@ -15,11 +15,24 @@ public class KafkaEventProducers {
     private final KafkaTemplate<String,Object> kafkaTemplate;
 
     public void publishViewCountEvent(ViewCountEvent viewCountEvent){
-        kafkaTemplate.send(KafkaConfig.TOPIC_NAME,viewCountEvent.getTargetId(),viewCountEvent)
-        .whenComplete((result,err)->{
-            if(err!=null){
-                System.out.println("Error publishing view count event :"+ err.getMessage());
-            }
-        });
+        try {
+            System.out.println("Publishing view count event for target ID: " + viewCountEvent.getTargetId());
+            
+            kafkaTemplate.send(KafkaConfig.TOPIC_NAME, viewCountEvent.getTargetId(), viewCountEvent)
+                .whenComplete((result, err) -> {
+                    if (err != null) {
+                        System.err.println("Failed to publish view count event for ID " + 
+                        viewCountEvent.getTargetId() + ": " + err.getMessage());
+                        err.printStackTrace();
+                    } else {
+                        System.out.println("Successfully published view count event for ID: " + 
+                        viewCountEvent.getTargetId() + " to topic: " + KafkaConfig.TOPIC_NAME);
+                    }
+                });
+                
+        } catch (Exception e) {
+            System.err.println("Critical error in publishViewCountEvent: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

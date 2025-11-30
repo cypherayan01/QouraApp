@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +19,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-
-import org.apache.kafka.common.serialization.StringDeserializer;
 
 
 
@@ -36,12 +35,12 @@ public class KafkaConfig {
     public static final String TOPIC_NAME = "view-count-topic";
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory(){ //ProducrFactory is used to create Kafka producers
+    public ProducerFactory<String, Object> producerFactory(){ //ProducrFactory is used to create a producer
         Map<String,Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
@@ -52,6 +51,7 @@ public class KafkaConfig {
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG,groupId);
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,JsonDeserializer.class);
+        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.dev.events");
 
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
@@ -65,7 +65,15 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String,Object> kafkaListenerContainerFactory(){
         ConcurrentKafkaListenerContainerFactory<String,Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        factory.setConcurrency(3);
+        factory.setConcurrency(1);
+        factory.getContainerProperties().setAckMode(org.springframework.kafka.listener.ContainerProperties.AckMode.RECORD);
+        factory.setCommonErrorHandler(new org.springframework.kafka.listener.DefaultErrorHandler(
+            (record, exception) -> {
+                System.err.println("Error processing Kafka message: " + exception.getMessage());
+                System.err.println("Failed record: " + record.toString());
+            }, 
+            new org.springframework.util.backoff.FixedBackOff(1000L, 3L)
+        ));
         return factory;
     }
 

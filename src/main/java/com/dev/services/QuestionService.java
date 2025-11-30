@@ -78,13 +78,27 @@ public class QuestionService implements IQuestionService {
 
     @Override
     public Mono<QuestionResponseDTO> getQuestionById(String id) {
+        return getQuestionByIdInternal(id, true);
+    }
+    
+    public Mono<QuestionResponseDTO> getQuestionByIdInternal(String id, boolean shouldTrackView) {
         return questionRepository.findById(id)
                 .map(QuestionAdapter::toQuestionResponseDTO)
-                .doOnError(error -> System.out.println("Error fetching question by ID: " + error))
-                .doOnSuccess(response ->{
-                    System.out.println("Question fetched successfully : " + response);
-                    ViewCountEvent viewCountEvent =new ViewCountEvent(id,"question",LocalDateTime.now());
-                    kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                .doOnError(error -> System.err.println("Error fetching question by ID: " + error.getMessage()))
+                .doOnSuccess(response -> {
+                    if (response != null) {
+                        System.out.println("Question fetched successfully: " + response.getTitle());
+                        
+                        if (shouldTrackView) {
+                            try {
+                                ViewCountEvent viewCountEvent = new ViewCountEvent(id, "question", LocalDateTime.now());
+                                kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                                System.out.println("View count event published for question ID: " + id);
+                            } catch (Exception e) {
+                                System.err.println("Error publishing view count event: " + e.getMessage());
+                            }
+                        }
+                    }
                 });
     }
 }

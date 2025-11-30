@@ -1,7 +1,10 @@
 package com.dev.controller;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,14 +14,8 @@ import com.dev.dto.QuestionResponseDTO;
 import com.dev.services.IQuestionService;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
-    public Mono<QuestionResponseDTO> getQuestionById(@PathVariable String id) {
+    public Mono<QuestionResponseDTO> getQuestionById(@PathVariable("id") String id) {
         return questionService.getQuestionById(id)
         .doOnSuccess(question -> System.out.println("Fetched question ID: " + question.getId()))
         .doOnError(error -> System.err.println("Error fetching question ID " + id + ": " + error.getMessage()));
@@ -41,8 +38,8 @@ public class QuestionController {
 
     @GetMapping
     public Flux<QuestionResponseDTO> getAllQuestions(
-        @RequestParam(required = false) String cursor,
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(value = "cursor", required = false) String cursor,
+        @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         return questionService.getAllQuestions(cursor, size)
                 .doOnError(error -> System.out.println("Error fetching questions : "+error))
@@ -50,23 +47,23 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    public Mono<Void> deleteQuestion(@PathVariable String id) {
+    public Mono<Void> deleteQuestion(@PathVariable("id") String id) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @GetMapping("/search")
     public Flux<QuestionResponseDTO> searchQuestions(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size) {
+            @RequestParam("query") String query,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "100") int size) {
         return questionService.searchQuestions(query, page, size);
     }
 
     @GetMapping("/tag/{tag}")
     public Flux<QuestionResponseDTO> getQuestionsByTag(
-        @PathVariable String tag,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size) {
+        @PathVariable("tag") String tag,
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "100") int size) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
