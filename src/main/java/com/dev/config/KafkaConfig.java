@@ -33,6 +33,7 @@ public class KafkaConfig {
     private String groupId;
 
     public static final String TOPIC_NAME = "view-count-topic";
+    public static final String ANSWER_NOTIFICATION_TOPIC = "answer-notification-topic";
 
     @Bean
     public ProducerFactory<String, Object> producerFactory(){ //ProducrFactory is used to create a producer

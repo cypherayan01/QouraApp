@@ -4,6 +4,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.dev.config.KafkaConfig;
+import com.dev.events.AnswerNotificationEvent;
 import com.dev.events.ViewCountEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,28 @@ public class KafkaEventProducers {
                 
         } catch (Exception e) {
             System.err.println("Critical error in publishViewCountEvent: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void publishAnswerNotificationEvent(AnswerNotificationEvent notificationEvent) {
+        try {
+            System.out.println("Publishing answer notification event for answer ID: " + notificationEvent.getAnswerId());
+            
+            kafkaTemplate.send(KafkaConfig.ANSWER_NOTIFICATION_TOPIC, notificationEvent.getQuestionId(), notificationEvent)
+                .whenComplete((result, err) -> {
+                    if (err != null) {
+                        System.err.println("Failed to publish answer notification event for answer ID " + 
+                        notificationEvent.getAnswerId() + ": " + err.getMessage());
+                        err.printStackTrace();
+                    } else {
+                        System.out.println("Successfully published answer notification event for answer ID: " + 
+                        notificationEvent.getAnswerId() + " to topic: " + KafkaConfig.ANSWER_NOTIFICATION_TOPIC);
+                    }
+                });
+                
+        } catch (Exception e) {
+            System.err.println("Critical error in publishAnswerNotificationEvent: " + e.getMessage());
             e.printStackTrace();
         }
     }
