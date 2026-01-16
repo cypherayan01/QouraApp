@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotBlank;
@@ -28,6 +29,10 @@ public class Question {
 
     @Id
     private String id;
+
+    @Indexed
+    @NotBlank(message = "User ID is required")
+    private String userId;
 
     @NotBlank(message = "Title is required")
     @Size(min = 10, max = 100, message = "Title must be between 10 and 100 characters")

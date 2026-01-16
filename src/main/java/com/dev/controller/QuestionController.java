@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +38,10 @@ public class QuestionController {
         @ApiResponse(responseCode = "201", description = "Question created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public Mono<QuestionResponseDTO> createQuestion(@Valid @RequestBody QuestionRequestDTO questionRequestDTO) {
-        return questionService.createQuestion(questionRequestDTO);
+    public Mono<QuestionResponseDTO> createQuestion(@Valid @RequestBody QuestionRequestDTO questionRequestDTO,
+         @RequestHeader("X-User-Id") String userId
+    ) {
+        return questionService.createQuestion(questionRequestDTO,userId);
     }
 
     @GetMapping("/{id}")

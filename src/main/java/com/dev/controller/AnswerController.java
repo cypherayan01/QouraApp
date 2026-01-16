@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -44,8 +45,8 @@ public class AnswerController {
         @ApiResponse(responseCode = "201", description = "Answer created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public Mono<AnswerResponseDTO> createAnswer(@Valid @RequestBody AnswerRequestDTO answerRequestDTO) {
-        return answerService.createAnswer(answerRequestDTO)
+    public Mono<AnswerResponseDTO> createAnswer(@Valid @RequestBody AnswerRequestDTO answerRequestDTO,@RequestHeader("X-User-Id") String userId) {
+        return answerService.createAnswer(answerRequestDTO,userId)
             .doOnSuccess(answer -> System.out.println("Created answer ID: " + answer.getId()))
             .doOnError(error -> System.err.println("Error creating answer: " + error.getMessage()));
     }

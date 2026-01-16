@@ -1,13 +1,13 @@
 package com.dev.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,21 +17,22 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "likes")
-public class Like {
+@Document(collection = "user_feeds")
+public class UserFeed {
 
     @Id
     private String id;
 
     @Indexed
-    @NotBlank(message = "User ID is required")
     private String userId;
 
-    private String targetId;
-    private String targetType; //QUESTION, ANSWER
+    private List<String> feedItemIds;
 
-    private Boolean isLike;
+    @LastModifiedDate
+    private LocalDateTime lastUpdatedAt;
 
-    @CreatedDate
-    private  LocalDateTime createdAt;
+    private boolean isActive=true;
+
+    private int maxItems=10; //keep last 10 items
+
 }

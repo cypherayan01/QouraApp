@@ -12,11 +12,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnswerResponseDTO {
-    private String id;
+     private String id;
+      private String content;
+      private String questionId;
+      private LocalDateTime createdAt;
+      private LocalDateTime updatedAt;
 
-    private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+      // User details
+      private String userId;
+      private String username;
+      private String displayName;
+      private String profilePictureUrl;
+
+      // Answer stats
+      @Builder.Default
+      private Long likeCount = 0L;
+
+      // Optional: Question context for feed
+      private String questionTitle;
 
 
 }
